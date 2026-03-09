@@ -3,4 +3,4 @@ database/*.db
 *.log
 .DS_Store
 .env
-vercel.json
+.git
