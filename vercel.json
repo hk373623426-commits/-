@@ -3,6 +3,10 @@
   "buildCommand": "",
   "builds": [
     {
+      "src": "public/**",
+      "use": "@vercel/static"
+    },
+    {
       "src": "api/app.js",
       "use": "@vercel/node",
       "config": {
