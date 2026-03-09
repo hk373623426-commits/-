@@ -4,14 +4,17 @@ const bcrypt = require('bcryptjs');
 
 class Database {
   constructor() {
-    // Vercel 使用临时文件系统
-    const dbPath = process.env.DB_PATH ||
-                   (process.env.VERCEL ? '/tmp/jingtian.db' : './database/jingtian.db');
+    // Vercel 环境强制使用 /tmp，避免在只读文件系统上创建目录
+    // process.env.VERCEL 存在表示在 Vercel 环境，忽略其他配置
+    const dbPath = process.env.VERCEL
+      ? '/tmp/jingtian.db'
+      : (process.env.DB_PATH || './database/jingtian.db');
+
     this.db = new sqlite3.Database(dbPath, (err) => {
       if (err) {
         console.error('数据库连接失败:', err.message);
       } else {
-        console.log('数据库连接成功');
+        console.log('数据库连接成功，路径:', dbPath);
       }
     });
   }

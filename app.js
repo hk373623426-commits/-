@@ -36,16 +36,16 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // Vercel 环境优化：使用临时目录存储数据库
-const isVercel = process.env.VERCEL || process.env.NODE_ENV === 'production';
-const dbPath = isVercel ? '/tmp/jingtian.db' : './database/jingtian.db';
-process.env.DB_PATH = dbPath;
+// Vercel 环境中，/var/task 是只读的，必须使用 /tmp
+const isVercel = !!process.env.VERCEL;
 
-// 确保数据库目录存在（Vercel 使用/tmp）
+// Vercel 环境下强制使用 /tmp，忽略 .env 中的 DB_PATH 配置
 if (isVercel) {
-  const dbDir = '/tmp';
-  if (!fs.existsSync(dbDir)) {
-    fs.mkdirSync(dbDir, { recursive: true });
-  }
+  process.env.DB_PATH = '/tmp/jingtian.db';
+  process.env.NODE_ENV = 'production';
+} else {
+  // 本地开发环境才使用 .env 中的配置
+  process.env.DB_PATH = process.env.DB_PATH || './database/jingtian.db';
 }
 
 // 数据库初始化（延迟初始化，确保 Vercel 环境正确）
