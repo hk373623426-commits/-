@@ -4,10 +4,6 @@
     {
       "src": "app.js",
       "use": "@vercel/node"
-    },
-    {
-      "src": "public/**",
-      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -28,8 +24,14 @@
       "dest": "app.js"
     }
   ],
+  "functions": {
+    "app.js": {
+      "maxDuration": 60
+    }
+  },
   "env": {
     "NODE_ENV": "production",
     "DB_PATH": "/tmp/jingtian.db"
-  }
+  },
+  "outputDirectory": "public"
 }

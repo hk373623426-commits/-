@@ -1,8 +1,8 @@
 const express = require('express');
-const session = require('express-session');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const cookieSession = require('cookie-session');
 require('dotenv').config();
 
 const app = express();
@@ -14,30 +14,48 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 会话配置
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'jingtian-water-secret',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 24 * 60 * 60 * 1000 // 24 小时
-  }
+// 使用 cookie-session（无状态，适合 Serverless）
+app.use(cookieSession({
+  name: 'jingtian_session',
+  keys: [process.env.SESSION_SECRET || 'jingtian-water-secret-key-2024'],
+  maxAge: 24 * 60 * 60 * 1000, // 24 小时
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax'
 }));
+
+// 兼容性：支持 req.session.user
+app.use((req, res, next) => {
+  if (req.session && req.session.user) {
+    res.locals.user = req.session.user;
+  }
+  next();
+});
 
 // 设置视图引擎
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// 确保数据库目录存在
-const dbDir = path.join(__dirname, 'database');
-if (!fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true });
+// Vercel 环境优化：使用临时目录存储数据库
+const isVercel = process.env.VERCEL || process.env.NODE_ENV === 'production';
+const dbPath = isVercel ? '/tmp/jingtian.db' : './database/jingtian.db';
+process.env.DB_PATH = dbPath;
+
+// 确保数据库目录存在（Vercel 使用/tmp）
+if (isVercel) {
+  const dbDir = '/tmp';
+  if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+  }
 }
 
-// 数据库初始化
+// 数据库初始化（延迟初始化，确保 Vercel 环境正确）
 const db = require('./config/database');
-db.initializeDatabase();
+if (isVercel) {
+  // Vercel 每次请求都需要重新初始化
+  db.initializeDatabase();
+} else {
+  db.initializeDatabase();
+}
 
 // 路由
 const indexRoutes = require('./routes/index');
