@@ -1,0 +1,296 @@
+<%- include('header', {
+    title: '购物车',
+    user: user
+}) %>
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>我的购物车</h4>
+                </div>
+                <div class="card-body">
+                    <% if (cartItems && cartItems.length > 0) { %>
+                        <div id="cartItems">
+                            <% cartItems.forEach(item => { %>
+                                <div class="cart-item mb-3" data-cart-item-id="<%= item.id %>">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-2">
+                                            <div class="cart-item-image">
+                                                <% if (item.image_url) { %>
+                                                    <img src="<%= item.image_url %>" alt="<%= item.name %>" class="img-fluid">
+                                                <% } else { %>
+                                                    <i class="fas fa-water fa-3x text-muted"></i>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h5 class="mb-1"><%= item.name %></h5>
+                                            <p class="text-muted mb-0">单价: ¥<%= item.price.toFixed(2) %></p>
+                                            <% if (item.stock < item.quantity) { %>
+                                                <small class="text-danger">库存不足，当前库存: <%= item.stock %></small>
+                                            <% } %>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="quantity-control d-flex align-items-center">
+                                                <button class="btn btn-outline-secondary quantity-minus" type="button">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                                <input type="number" class="form-control quantity-input text-center mx-2"
+                                                       value="<%= item.quantity %>" min="1" max="<%= item.stock %>"
+                                                       data-price="<%= item.price %>">
+                                                <button class="btn btn-outline-secondary quantity-plus" type="button">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 text-center">
+                                            <h5 class="item-total">¥<%= (item.price * item.quantity).toFixed(2) %></h5>
+                                        </div>
+                                        <div class="col-md-1 text-center">
+                                            <button class="btn btn-danger btn-sm remove-item" data-item-id="<%= item.id %>">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+                            <% }); %>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="/products" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-left me-2"></i>继续购物
+                            </a>
+                            <button class="btn btn-danger" id="clearCart">
+                                <i class="fas fa-trash me-2"></i>清空购物车
+                            </button>
+                        </div>
+                    <% } else { %>
+                        <div class="text-center py-5">
+                            <i class="fas fa-shopping-cart fa-5x text-muted mb-3"></i>
+                            <h4>购物车为空</h4>
+                            <p class="text-muted mb-4">快去挑选心仪的商品吧</p>
+                            <a href="/products" class="btn btn-primary">
+                                <i class="fas fa-water me-2"></i>去选购商品
+                            </a>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-receipt me-2"></i>订单摘要</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>商品总价:</span>
+                        <span id="subtotal">¥<%= totalAmount.toFixed(2) %></span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>配送费:</span>
+                        <span>¥0.00</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>总计:</h5>
+                        <h4 class="text-primary" id="totalAmount">¥<%= totalAmount.toFixed(2) %></h4>
+                    </div>
+
+                    <% if (cartItems && cartItems.length > 0) { %>
+                        <div class="d-grid gap-2">
+                            <a href="/checkout" class="btn btn-success btn-lg">
+                                <i class="fas fa-credit-card me-2"></i>去结算
+                            </a>
+                        </div>
+                    <% } else { %>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success btn-lg" disabled>
+                                <i class="fas fa-credit-card me-2"></i>去结算
+                            </button>
+                        </div>
+                    <% } %>
+
+                    <div class="mt-4">
+                        <h6><i class="fas fa-shield-alt me-2"></i>购物保障</h6>
+                        <ul class="list-unstyled text-muted small">
+                            <li><i class="fas fa-check text-success me-2"></i>正品保证</li>
+                            <li><i class="fas fa-check text-success me-2"></i>快速配送</li>
+                            <li><i class="fas fa-check text-success me-2"></i>无忧售后</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 更新购物车项数量
+    function updateCartItem(cartItemId, quantity) {
+        fetch('/cart/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                cartItemId: cartItemId,
+                quantity: quantity
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateCartSummary(data.totalAmount);
+                updateCartCount(data.cartItems.reduce((sum, item) => sum + item.quantity, 0));
+            } else {
+                showAlert(data.message || '更新失败', 'danger');
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('更新购物车失败:', error);
+            showAlert('网络错误，请稍后重试', 'danger');
+        });
+    }
+
+    // 更新购物车摘要
+    function updateCartSummary(totalAmount) {
+        document.getElementById('subtotal').textContent = '¥' + totalAmount.toFixed(2);
+        document.getElementById('totalAmount').textContent = '¥' + totalAmount.toFixed(2);
+    }
+
+    // 更新购物车数量显示
+    function updateCartCount(count) {
+        const cartCount = document.querySelector('.cart-count');
+        if (cartCount) {
+            cartCount.textContent = count;
+            cartCount.style.display = count > 0 ? 'flex' : 'none';
+        }
+    }
+
+    // 数量控制
+    document.querySelectorAll('.quantity-minus').forEach(button => {
+        button.addEventListener('click', function() {
+            const cartItem = this.closest('.cart-item');
+            const cartItemId = cartItem.dataset.cartItemId;
+            const input = cartItem.querySelector('.quantity-input');
+            let quantity = parseInt(input.value) || 1;
+
+            if (quantity > 1) {
+                quantity--;
+                input.value = quantity;
+                updateCartItem(cartItemId, quantity);
+            }
+        });
+    });
+
+    document.querySelectorAll('.quantity-plus').forEach(button => {
+        button.addEventListener('click', function() {
+            const cartItem = this.closest('.cart-item');
+            const cartItemId = cartItem.dataset.cartItemId;
+            const input = cartItem.querySelector('.quantity-input');
+            const maxStock = parseInt(input.max) || 999;
+            let quantity = parseInt(input.value) || 1;
+
+            if (quantity < maxStock) {
+                quantity++;
+                input.value = quantity;
+                updateCartItem(cartItemId, quantity);
+            } else {
+                showAlert('已达到最大库存限制', 'warning');
+            }
+        });
+    });
+
+    // 输入框变化
+    document.querySelectorAll('.quantity-input').forEach(input => {
+        input.addEventListener('change', function() {
+            const cartItem = this.closest('.cart-item');
+            const cartItemId = cartItem.dataset.cartItemId;
+            const maxStock = parseInt(this.max) || 999;
+            let quantity = parseInt(this.value) || 1;
+
+            if (quantity < 1) {
+                quantity = 1;
+                this.value = 1;
+            } else if (quantity > maxStock) {
+                quantity = maxStock;
+                this.value = maxStock;
+                showAlert('已达到最大库存限制', 'warning');
+            }
+
+            updateCartItem(cartItemId, quantity);
+        });
+    });
+
+    // 删除商品
+    document.querySelectorAll('.remove-item').forEach(button => {
+        button.addEventListener('click', function() {
+            const cartItemId = this.dataset.itemId;
+
+            if (confirm('确定要从购物车中删除此商品吗？')) {
+                fetch('/cart/remove', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        cartItemId: cartItemId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('商品已从购物车移除', 'success');
+                        updateCartCount(data.cartCount);
+                        location.reload();
+                    } else {
+                        showAlert(data.message || '删除失败', 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('删除商品失败:', error);
+                    showAlert('网络错误，请稍后重试', 'danger');
+                });
+            }
+        });
+    });
+
+    // 清空购物车
+    const clearCartBtn = document.getElementById('clearCart');
+    if (clearCartBtn) {
+        clearCartBtn.addEventListener('click', function() {
+            if (confirm('确定要清空购物车吗？')) {
+                fetch('/cart/clear', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('购物车已清空', 'success');
+                        updateCartCount(0);
+                        location.reload();
+                    } else {
+                        showAlert(data.message || '清空失败', 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('清空购物车失败:', error);
+                    showAlert('网络错误，请稍后重试', 'danger');
+                });
+            }
+        });
+    }
+});
+</script>
+
+<%- include('footer') %>

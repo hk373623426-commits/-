@@ -1,0 +1,241 @@
+<%- include('frontend/header', {
+    title: '仪表盘',
+    currentPage: 'dashboard',
+    user: user
+}) %>
+
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body stats-card">
+                <div class="stats-icon orders">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div class="stats-number"><%= stats.totalOrders %></div>
+                <div class="stats-label">总订单数</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body stats-card">
+                <div class="stats-icon users">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stats-number"><%= stats.totalUsers %></div>
+                <div class="stats-label">注册用户</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body stats-card">
+                <div class="stats-icon products">
+                    <i class="fas fa-water"></i>
+                </div>
+                <div class="stats-number"><%= stats.totalProducts %></div>
+                <div class="stats-label">产品数量</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body stats-card">
+                <div class="stats-icon revenue">
+                    <i class="fas fa-yen-sign"></i>
+                </div>
+                <div class="stats-number">¥<%= stats.totalRevenue.toFixed(2) %></div>
+                <div class="stats-label">总收入</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 最近订单 -->
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">最近订单</h5>
+                <a href="/admin/orders" class="btn btn-admin btn-admin-primary btn-sm">查看全部</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>订单号</th>
+                                <th>客户</th>
+                                <th>金额</th>
+                                <th>状态</th>
+                                <th>时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (recentOrders && recentOrders.length > 0) { %>
+                                <% recentOrders.forEach(order => { %>
+                                    <tr>
+                                        <td><%= order.order_number %></td>
+                                        <td><%= order.username %></td>
+                                        <td>¥<%= order.total_amount.toFixed(2) %></td>
+                                        <td>
+                                            <span class="status-badge status-<%= order.status %>">
+                                                <%= order.status === 'pending' ? '待处理' :
+                                                   order.status === 'processing' ? '处理中' :
+                                                   order.status === 'completed' ? '已完成' :
+                                                   order.status === 'cancelled' ? '已取消' : order.status %>
+                                            </span>
+                                        </td>
+                                        <td><%= new Date(order.created_at).toLocaleDateString() %></td>
+                                        <td>
+                                            <a href="/admin/orders/<%= order.id %>" class="btn btn-admin btn-admin-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-4">暂无订单数据</td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 订单状态统计 -->
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">订单状态统计</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="orderStatusChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 月度收入统计 -->
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">月度收入统计</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="revenueChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- 热门产品 -->
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">热门产品</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <% if (topProducts && topProducts.length > 0) { %>
+                        <% topProducts.forEach(product => { %>
+                            <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1"><%= product.name %></h6>
+                                    <small class="text-muted">销量: <%= product.total_sold || 0 %></small>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">¥<%= product.price.toFixed(2) %></span>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="text-center text-muted py-4">暂无产品数据</div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// 订单状态统计图表
+const orderStatusCtx = document.getElementById('orderStatusChart').getContext('2d');
+const orderStatusChart = new Chart(orderStatusCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['待处理', '处理中', '已完成', '已取消'],
+        datasets: [{
+            data: [
+                <%= stats.orderStatus.pending || 0 %>,
+                <%= stats.orderStatus.processing || 0 %>,
+                <%= stats.orderStatus.completed || 0 %>,
+                <%= stats.orderStatus.cancelled || 0 %>
+            ],
+            backgroundColor: [
+                '#ffc107',
+                '#0dcaf0',
+                '#198754',
+                '#dc3545'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+
+// 月度收入统计图表
+const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+const revenueChart = new Chart(revenueCtx, {
+    type: 'line',
+    data: {
+        labels: <%= JSON.stringify(monthlyRevenue.labels || []) %>,
+        datasets: [{
+            label: '收入 (元)',
+            data: <%= JSON.stringify(monthlyRevenue.data || []) %>,
+            borderColor: '#2c7be5',
+            backgroundColor: 'rgba(44, 123, 229, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return '¥' + value;
+                    }
+                }
+            }
+        }
+    }
+});
+
+// 自动刷新数据（每5分钟）
+setTimeout(() => {
+    location.reload();
+}, 5 * 60 * 1000);
+</script>
+
+<%- include('frontend/footer') %>

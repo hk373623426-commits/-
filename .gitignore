@@ -1,0 +1,12 @@
+node_modules
+database/*.db
+*.log
+.DS_Store
+.env
+.vercel
+.tmp
+coverage
+*.tgz
+.idea
+.vscode
+dist

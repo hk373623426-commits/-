@@ -1,0 +1,35 @@
+{
+  "name": "jingtian-water-website",
+  "version": "1.0.0",
+  "description": "景田天然矿泉水桶装水自助下单网站",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "init": "node scripts/init-data.js",
+    "reset": "rm -rf database && npm run init"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "ejs": "^5.0.1",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "express-validator": "^7.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "桶装水",
+    "矿泉水",
+    "自助下单",
+    "电商"
+  ],
+  "author": "景田天然矿泉水",
+  "license": "MIT"
+}

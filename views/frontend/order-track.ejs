@@ -1,0 +1,147 @@
+<%- include('header', {
+    title: '订单查询',
+    user: null,
+    cartCount: 0
+}) %>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-search-location me-2"></i>订单查询</h4>
+                </div>
+                <div class="card-body">
+                    <form id="trackForm" class="mb-4">
+                        <div class="mb-3">
+                            <label class="form-label">订单编号</label>
+                            <input type="text" class="form-control" id="orderNumber" placeholder="请输入订单编号" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">联系电话</label>
+                            <input type="tel" class="form-control" id="phone" placeholder="请输入下单时的手机号" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search me-2"></i>查询订单
+                        </button>
+                    </form>
+
+                    <div id="orderResult" style="display: none;"></div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <p class="text-muted">
+                    <a href="/">返回首页</a> |
+                    <a href="/products">继续购物</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('trackForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const orderNumber = document.getElementById('orderNumber').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+
+    try {
+        const response = await fetch(`/orders/track?order_number=${encodeURIComponent(orderNumber)}&phone=${encodeURIComponent(phone)}`);
+        const result = await response.json();
+
+        if (result.success) {
+            displayOrder(result.order);
+        } else {
+            showAlert(result.message || '未找到订单，请检查订单号和手机号', 'warning');
+        }
+    } catch (error) {
+        console.error('查询失败:', error);
+        showAlert('网络错误，请稍后重试', 'danger');
+    }
+});
+
+function displayOrder(order) {
+    const statusMap = {
+        'pending': { text: '待确认', class: 'warning' },
+        'confirmed': { text: '已确认', class: 'info' },
+        'delivering': { text: '配送中', class: 'primary' },
+        'completed': { text: '已完成', class: 'success' },
+        'cancelled': { text: '已取消', class: 'danger' }
+    };
+
+    const status = statusMap[order.status] || { text: order.status, class: 'secondary' };
+
+    const html = `
+        <div class="card border-${status.class}">
+            <div class="card-header bg-${status.class} text-white">
+                <h5><i class="fas fa-clipboard-list me-2"></i>订单详情</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="badge bg-${status.class} fs-6">${status.text}</span>
+                    <span class="ms-3"><strong>订单号：</strong>${order.order_number}</span>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>收货人：</strong>${order.customer_name}</p>
+                        <p class="mb-1"><strong>电话：</strong>${order.customer_phone}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>地址：</strong>${order.delivery_address}</p>
+                    </div>
+                </div>
+
+                <hr>
+
+                <h6>商品清单</h6>
+                <ul class="list-group list-group-flush mb-3">
+                    ${order.items.map(item => `
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>${item.product_name}</strong>
+                                <small class="text-muted"> × ${item.quantity}</small>
+                            </div>
+                            <span>¥${(item.price * item.quantity).toFixed(2)}</span>
+                        </li>
+                    `).join('')}
+                </ul>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted">下单时间：${new Date(order.created_at).toLocaleString('zh-CN')}</span>
+                    <span class="h4 text-primary">总计：¥${order.total_amount.toFixed(2)}</span>
+                </div>
+
+                ${order.remark ? `
+                    <div class="alert alert-light mt-3">
+                        <strong>备注：</strong>${order.remark}
+                    </div>
+                ` : ''}
+            </div>
+        </div>
+    `;
+
+    const resultDiv = document.getElementById('orderResult');
+    resultDiv.innerHTML = html;
+    resultDiv.style.display = 'block';
+}
+
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    const form = document.getElementById('trackForm');
+    form.insertAdjacentElement('afterend', alertDiv);
+
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 3000);
+}
+</script>
+
+<%- include('footer') %>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - 景田天然矿泉水</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+</head>
+<body>
+    <!-- 头部导航 -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-tint fa-2x"></i>
+                <h1>景田<span>天然矿泉水</span></h1>
+            </div>
+
+            <button class="menu-toggle d-md-none">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="/"><i class="fas fa-home"></i> 首页</a></li>
+                    <li><a href="/products"><i class="fas fa-water"></i> 产品中心</a></li>
+                    <li><a href="/about"><i class="fas fa-info-circle"></i> 关于我们</a></li>
+                    <li><a href="/contact"><i class="fas fa-phone"></i> 联系我们</a></li>
+                    <% if (user) { %>
+                        <li><a href="/orders"><i class="fas fa-clipboard-list"></i> 我的订单</a></li>
+                        <li><a href="/profile"><i class="fas fa-user"></i> <%= user.username %></a></li>
+                        <li><a href="/auth/logout"><i class="fas fa-sign-out-alt"></i> 退出</a></li>
+                    <% } else { %>
+                        <li><a href="/auth/login"><i class="fas fa-sign-in-alt"></i> 登录</a></li>
+                        <li><a href="/auth/register"><i class="fas fa-user-plus"></i> 注册</a></li>
+                    <% } %>
+                </ul>
+            </nav>
+
+            <div class="user-menu">
+                <a href="/cart" class="cart-icon">
+                    <i class="fas fa-shopping-cart fa-lg"></i>
+                    <% if (cartCount && cartCount > 0) { %>
+                        <span class="cart-count"><%= cartCount %></span>
+                    <% } %>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容区域 -->
+    <main>
+        <% if (typeof message !== 'undefined' && message) { %>
+            <div class="container mt-3">
+                <div class="alert alert-<%= message.type || 'info' %>">
+                    <%= message.text %>
+                </div>
+            </div>
+        <% } %>
+
+        <%- body %>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>景田天然矿泉水</h3>
+                <p>提供优质的天然矿泉水配送服务，让健康饮水触手可及。</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-weixin"></i></a>
+                    <a href="#"><i class="fab fa-weibo"></i></a>
+                    <a href="#"><i class="fab fa-qq"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h3>快速链接</h3>
+                <ul>
+                    <li><a href="/">首页</a></li>
+                    <li><a href="/products">产品中心</a></li>
+                    <li><a href="/about">关于我们</a></li>
+                    <li><a href="/contact">联系我们</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>联系我们</h3>
+                <ul>
+                    <li><i class="fas fa-phone"></i> 400-888-8888</li>
+                    <li><i class="fas fa-envelope"></i> service@jingtian.com</li>
+                    <li><i class="fas fa-map-marker-alt"></i> 北京市朝阳区景田大厦</li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>服务时间</h3>
+                <ul>
+                    <li>周一至周五: 8:00-20:00</li>
+                    <li>周六至周日: 9:00-18:00</li>
+                    <li>节假日: 10:00-16:00</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="copyright">
+            <p>&copy; 2026 景田天然矿泉水. 保留所有权利.</p>
+        </div>
+    </footer>
+
+    <!-- 脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/main.js"></script>
+    <% if (scripts) { %>
+        <% scripts.forEach(script => { %>
+            <script src="<%= script %>"></script>
+        <% }); %>
+    <% } %>
+</body>
+</html>

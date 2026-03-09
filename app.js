@@ -1,0 +1,84 @@
+const express = require('express');
+const session = require('express-session');
+const cors = require('cors');
+const path = require('path');
+const fs = require('fs');
+require('dotenv').config();
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// 中间件配置
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// 会话配置
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'jingtian-water-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 * 1000 // 24 小时
+  }
+}));
+
+// 设置视图引擎
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+// 确保数据库目录存在
+const dbDir = path.join(__dirname, 'database');
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
+}
+
+// 数据库初始化
+const db = require('./config/database');
+db.initializeDatabase();
+
+// 路由
+const indexRoutes = require('./routes/index');
+const authRoutes = require('./routes/auth');
+const productRoutes = require('./routes/products');
+const cartRoutes = require('./routes/cart');
+const orderRoutes = require('./routes/orders');
+const adminRoutes = require('./routes/admin');
+
+app.use('/', indexRoutes);
+app.use('/auth', authRoutes);
+app.use('/products', productRoutes);
+app.use('/cart', cartRoutes);
+app.use('/orders', orderRoutes);
+app.use('/admin', adminRoutes);
+
+// 错误处理中间件
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || '服务器内部错误'
+  });
+});
+
+// 404 处理
+app.use((req, res) => {
+  res.status(404).render('frontend/404', {
+    title: '页面未找到',
+    user: req.session.user
+  });
+});
+
+// Vercel 导出
+module.exports = app;
+
+// 本地运行时启动服务器
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`景田天然矿泉水网站运行在 http://localhost:${PORT}`);
+    console.log(`后台管理地址：http://localhost:${PORT}/admin/login`);
+    console.log(`网络访问地址：http://127.0.0.1:${PORT}`);
+  });
+}

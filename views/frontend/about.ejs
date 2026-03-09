@@ -1,0 +1,201 @@
+<%- include('header', {
+    cartCount: typeof cartCount !== 'undefined' ? cartCount : 0,
+    title: '关于我们',
+    user: user
+}) %>
+
+<!-- 页面标题 -->
+<section class="page-header bg-primary text-white py-5">
+    <div class="container">
+        <h1 class="display-4">关于我们</h1>
+        <p class="lead">了解景田天然矿泉水的故事</p>
+    </div>
+</section>
+
+<!-- 公司简介 -->
+<section class="about-intro py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-4 mb-md-0">
+                <div class="about-image bg-light rounded d-flex align-items-center justify-content-center" style="height: 400px;">
+                    <i class="fas fa-building fa-6x text-primary"></i>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h2 class="mb-4">公司简介</h2>
+                <p>景田天然矿泉水有限公司成立于 1992 年，是一家专注于天然矿泉水开发、生产和销售的企业。公司总部位于广东省深圳市，在全国拥有多个优质水源地和现代化生产基地。</p>
+                <p>三十年来，景田始终秉承"质量第一、顾客至上"的经营理念，致力于为千家万户提供健康、安全、优质的饮用水产品。经过多年发展，景田已成为中国包装饮用水行业的领军企业之一。</p>
+                <p>我们拥有先进的生产设备和严格的质量管理体系，每一滴水都经过层层过滤和严格检测，确保符合国家饮用水标准。景田产品已通过 ISO9001 质量管理体系认证、ISO14001 环境管理体系认证等多项权威认证。</p>
+                <div class="mt-4">
+                    <a href="/products" class="btn btn-primary btn-lg">浏览产品</a>
+                    <a href="/contact" class="btn btn-outline-primary btn-lg ms-2">联系我们</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 企业优势 -->
+<section class="advantages py-5 bg-light">
+    <div class="container">
+        <div class="section-title text-center mb-5">
+            <h2>企业优势</h2>
+            <p class="text-muted">为什么选择景田</p>
+        </div>
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="advantage-card text-center p-4 bg-white rounded shadow-sm h-100">
+                    <div class="advantage-icon mb-3">
+                        <i class="fas fa-mountain fa-4x text-primary"></i>
+                    </div>
+                    <h4>优质水源</h4>
+                    <p class="text-muted">拥有多处天然优质水源地，水源来自深层地下，经过天然过滤，富含多种矿物质和微量元素。</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="advantage-card text-center p-4 bg-white rounded shadow-sm h-100">
+                    <div class="advantage-icon mb-3">
+                        <i class="fas fa-flask fa-4x text-primary"></i>
+                    </div>
+                    <h4>严格质检</h4>
+                    <p class="text-muted">建立完善的质量检测体系，每批次产品都经过严格的理化指标和微生物指标检测，确保水质安全。</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="advantage-card text-center p-4 bg-white rounded shadow-sm h-100">
+                    <div class="advantage-icon mb-3">
+                        <i class="fas fa-conveyor-belt fa-4x text-primary"></i>
+                    </div>
+                    <h4>先进工艺</h4>
+                    <p class="text-muted">引进国际先进的生产线和灌装设备，采用全自动无菌灌装技术，确保产品在生产过程中的纯净度。</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="advantage-card text-center p-4 bg-white rounded shadow-sm h-100">
+                    <div class="advantage-icon mb-3">
+                        <i class="fas fa-truck fa-4x text-primary"></i>
+                    </div>
+                    <h4>配送网络</h4>
+                    <p class="text-muted">覆盖全国的物流配送网络，专业的配送团队，确保产品及时、安全送达客户手中。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 企业文化 -->
+<section class="culture py-5">
+    <div class="container">
+        <div class="section-title text-center mb-5">
+            <h2>企业文化</h2>
+            <p class="text-muted">我们的使命、愿景和价值观</p>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="culture-card p-4 border rounded text-center h-100">
+                    <div class="culture-icon mb-3">
+                        <i class="fas fa-bullseye fa-4x text-primary"></i>
+                    </div>
+                    <h3>企业使命</h3>
+                    <p class="text-muted mt-3">"为亿万人提供健康饮用水，让生命之源更纯净"</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="culture-card p-4 border rounded text-center h-100">
+                    <div class="culture-icon mb-3">
+                        <i class="fas fa-eye fa-4x text-primary"></i>
+                    </div>
+                    <h3>企业愿景</h3>
+                    <p class="text-muted mt-3">"成为最受尊敬的饮用水企业，引领健康饮水新生活"</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="culture-card p-4 border rounded text-center h-100">
+                    <div class="culture-icon mb-3">
+                        <i class="fas fa-heart fa-4x text-primary"></i>
+                    </div>
+                    <h3>核心价值观</h3>
+                    <p class="text-muted mt-3">"诚信、品质、创新、责任"</p>
+                    <p class="small text-muted mt-2">以客户为中心，以品质为根本，持续创新，回馈社会</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 发展历程 -->
+<section class="history py-5 bg-light">
+    <div class="container">
+        <div class="section-title text-center mb-5">
+            <h2>发展历程</h2>
+            <p class="text-muted">三十载砥砺前行</p>
+        </div>
+        <div class="timeline">
+            <div class="row mb-4">
+                <div class="col-md-2 text-end">
+                    <h4 class="text-primary">1992</h4>
+                </div>
+                <div class="col-md-10">
+                    <div class="timeline-content p-3 bg-white rounded">
+                        <h5>公司成立</h5>
+                        <p class="text-muted mb-0">景田公司在深圳成立，开始涉足饮用水行业</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-md-2 text-end">
+                    <h4 class="text-primary">2000</h4>
+                </div>
+                <div class="col-md-10">
+                    <div class="timeline-content p-3 bg-white rounded">
+                        <h5>全国布局</h5>
+                        <p class="text-muted mb-0">在广东、北京、上海等地建立生产基地，实现全国化布局</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-md-2 text-end">
+                    <h4 class="text-primary">2008</h4>
+                </div>
+                <div class="col-md-10">
+                    <div class="timeline-content p-3 bg-white rounded">
+                        <h5>质量认证</h5>
+                        <p class="text-muted mb-0">通过 ISO9001 质量管理体系认证，产品质量达到国际先进水平</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-md-2 text-end">
+                    <h4 class="text-primary">2015</h4>
+                </div>
+                <div class="col-md-10">
+                    <div class="timeline-content p-3 bg-white rounded">
+                        <h5>品牌升级</h5>
+                        <p class="text-muted mb-0">启动品牌升级战略，推出高端矿泉水系列，提升品牌形象</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2 text-end">
+                    <h4 class="text-primary">2026</h4>
+                </div>
+                <div class="col-md-10">
+                    <div class="timeline-content p-3 bg-white rounded">
+                        <h5>数字化时代</h5>
+                        <p class="text-muted mb-0">上线电商平台，实现线上线下融合发展，为用户提供更便捷的购水体验</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 联系我们 CTA -->
+<section class="cta py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="mb-4">成为我们的客户</h2>
+        <p class="lead mb-4">立即注册，享受新用户专属优惠</p>
+        <a href="/auth/register" class="btn btn-light btn-lg me-2">免费注册</a>
+        <a href="/contact" class="btn btn-outline-light btn-lg">联系客服</a>
+    </div>
+</section>

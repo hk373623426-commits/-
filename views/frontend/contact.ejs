@@ -1,0 +1,313 @@
+<%- include('header', {
+    cartCount: typeof cartCount !== 'undefined' ? cartCount : 0,
+    title: '联系我们',
+    user: user
+}) %>
+
+<!-- 页面标题 -->
+<section class="page-header bg-primary text-white py-5">
+    <div class="container">
+        <h1 class="display-4">联系我们</h1>
+        <p class="lead">我们随时为您服务</p>
+    </div>
+</section>
+
+<!-- 联系方式 -->
+<section class="contact-info py-5">
+    <div class="container">
+        <div class="row">
+            <!-- 联系方式卡片 -->
+            <div class="col-md-4 mb-4">
+                <div class="contact-card text-center p-4 border rounded shadow-sm h-100">
+                    <div class="contact-icon mb-3">
+                        <i class="fas fa-phone-volume fa-4x text-primary"></i>
+                    </div>
+                    <h4>客服热线</h4>
+                    <p class="text-muted mb-2">工作时间：周一至周五 8:00-20:00</p>
+                    <p class="h5 text-primary">400-888-8888</p>
+                    <p class="small text-muted">全国统一服务热线，免长途费</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="contact-card text-center p-4 border rounded shadow-sm h-100">
+                    <div class="contact-icon mb-3">
+                        <i class="fas fa-envelope fa-4x text-primary"></i>
+                    </div>
+                    <h4>电子邮箱</h4>
+                    <p class="text-muted mb-2">业务咨询与投诉建议</p>
+                    <p class="h5 text-primary">service@jingtian.com</p>
+                    <p class="small text-muted">我们将在 24 小时内回复</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="contact-card text-center p-4 border rounded shadow-sm h-100">
+                    <div class="contact-icon mb-3">
+                        <i class="fas fa-map-marker-alt fa-4x text-primary"></i>
+                    </div>
+                    <h4>公司地址</h4>
+                    <p class="text-muted mb-2">总部办公地址</p>
+                    <p class="h5">北京市朝阳区</p>
+                    <p class="small text-muted">景田大厦 18 层</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 在线留言 -->
+<section class="contact-form py-5 bg-light">
+    <div class="container">
+        <div class="section-title text-center mb-5">
+            <h2>在线留言</h2>
+            <p class="text-muted">填写以下表单，我们将尽快与您联系</p>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="contact-form-card bg-white p-5 rounded shadow">
+                    <form id="contactForm" onsubmit="return submitForm(event)">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">姓名 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" name="name" required placeholder="请输入您的姓名">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">联系电话 <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" id="phone" name="phone" required placeholder="请输入您的手机号码" pattern="[0-9]{11}">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">电子邮箱</label>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="请输入您的邮箱">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="subject" class="form-label">主题 <span class="text-danger">*</span></label>
+                                <select class="form-select" id="subject" name="subject" required>
+                                    <option value="">请选择咨询主题</option>
+                                    <option value="product">产品咨询</option>
+                                    <option value="order">订单问题</option>
+                                    <option value="delivery">配送服务</option>
+                                    <option value="quality">质量问题</option>
+                                    <option value="cooperation">合作洽谈</option>
+                                    <option value="other">其他</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">收货地址</label>
+                            <input type="text" class="form-control" id="address" name="address" placeholder="请输入详细收货地址">
+                        </div>
+                        <div class="mb-4">
+                            <label for="message" class="form-label">留言内容 <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="message" name="message" rows="5" required placeholder="请详细描述您的问题或需求"></textarea>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane"></i> 提交留言
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 服务网点 -->
+<section class="service-centers py-5">
+    <div class="container">
+        <div class="section-title text-center mb-5">
+            <h2>服务网点</h2>
+            <p class="text-muted">全国主要城市服务点</p>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="service-center-card p-4 border rounded">
+                    <h5><i class="fas fa-location-dot text-primary me-2"></i>北京服务中心</h5>
+                    <p class="text-muted mb-1">地址：北京市朝阳区景田大厦</p>
+                    <p class="text-muted mb-1">电话：010-88888888</p>
+                    <p class="text-muted small">服务时间：周一至周日 8:00-20:00</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="service-center-card p-4 border rounded">
+                    <h5><i class="fas fa-location-dot text-primary me-2"></i>上海服务中心</h5>
+                    <p class="text-muted mb-1">地址：上海市浦东新区陆家嘴路 100 号</p>
+                    <p class="text-muted mb-1">电话：021-68888888</p>
+                    <p class="text-muted small">服务时间：周一至周日 8:00-20:00</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="service-center-card p-4 border rounded">
+                    <h5><i class="fas fa-location-dot text-primary me-2"></i>广州服务中心</h5>
+                    <p class="text-muted mb-1">地址：广州市天河区天河路 200 号</p>
+                    <p class="text-muted mb-1">电话：020-38888888</p>
+                    <p class="text-muted small">服务时间：周一至周日 8:00-20:00</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="service-center-card p-4 border rounded">
+                    <h5><i class="fas fa-location-dot text-primary me-2"></i>深圳服务中心</h5>
+                    <p class="text-muted mb-1">地址：深圳市福田区深南大道 300 号</p>
+                    <p class="text-muted mb-1">电话：0755-88888888</p>
+                    <p class="text-muted small">服务时间：周一至周日 8:00-20:00</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="service-center-card p-4 border rounded">
+                    <h5><i class="fas fa-location-dot text-primary me-2"></i>成都服务中心</h5>
+                    <p class="text-muted mb-1">地址：成都市锦江区春熙路 150 号</p>
+                    <p class="text-muted mb-1">电话：028-86888888</p>
+                    <p class="text-muted small">服务时间：周一至周日 8:00-20:00</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="service-center-card p-4 border rounded">
+                    <h5><i class="fas fa-location-dot text-primary me-2"></i>武汉服务中心</h5>
+                    <p class="text-muted mb-1">地址：武汉市武昌区中南路 80 号</p>
+                    <p class="text-muted mb-1">电话：027-87888888</p>
+                    <p class="text-muted small">服务时间：周一至周日 8:00-20:00</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 地图区域 -->
+<section class="map-section py-5 bg-light">
+    <div class="container">
+        <div class="section-title text-center mb-5">
+            <h2>公司位置</h2>
+            <p class="text-muted">欢迎来访，请提前预约</p>
+        </div>
+        <div class="map-container bg-white rounded shadow p-3" style="height: 400px;">
+            <div class="d-flex align-items-center justify-content-center h-100 bg-light rounded">
+                <div class="text-center">
+                    <i class="fas fa-map-marked-alt fa-5x text-primary mb-3"></i>
+                    <p class="text-muted">地图加载中...</p>
+                    <small class="text-muted">北京市朝阳区景田大厦 18 层</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ 常见问题 -->
+<section class="faq py-5">
+    <div class="container">
+        <div class="section-title text-center mb-5">
+            <h2>常见问题</h2>
+            <p class="text-muted">您可能想知道的问题</p>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                如何订购桶装水？
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                您可以通过以下方式订购：
+                                <ol class="mb-0">
+                                    <li>登录网站，在产品中心选择所需产品后加入购物车结算</li>
+                                    <li>拨打客服热线 400-888-8888 电话订购</li>
+                                    <li>关注官方微信公众号进行在线下单</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                配送范围和时间是怎样的？
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                目前我们主要服务于全国一二线城市市区范围。一般情况下：
+                                <ul class="mb-0">
+                                    <li>市区内：下单后 2-4 小时送达</li>
+                                    <li>郊区：下单后 4-8 小时送达</li>
+                                    <li>具体配送时间以客服人员确认为准</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                空桶押金如何收取和退还？
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <ul class="mb-0">
+                                    <li>首次订购需支付桶押金，一般为 50-100 元/桶（视桶型而定）</li>
+                                    <li>押金桶可循环使用，退桶时凭完好水桶和押金收据全额退还押金</li>
+                                    <li>也可选择购买水桶，购买后无需退还</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingFour">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                如何开具发票？
+                            </button>
+                        </h2>
+                        <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                您可以在下单时选择需要发票，填写发票抬头和税号等信息。我们提供电子发票和纸质发票两种选择：
+                                <ul class="mb-0">
+                                    <li>电子发票：订单完成后发送至您的邮箱</li>
+                                    <li>纸质发票：随订单配送或邮寄给您</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+function submitForm(event) {
+    event.preventDefault();
+
+    const formData = {
+        name: document.getElementById('name').value,
+        phone: document.getElementById('phone').value,
+        email: document.getElementById('email').value,
+        subject: document.getElementById('subject').value,
+        address: document.getElementById('address').value,
+        message: document.getElementById('message').value
+    };
+
+    fetch('/contact/submit', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('留言提交成功！我们将尽快与您联系。');
+            document.getElementById('contactForm').reset();
+        } else {
+            alert(data.message || '提交失败，请重试');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('提交失败，请重试');
+    });
+
+    return false;
+}
+</script>

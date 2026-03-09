@@ -1,0 +1,234 @@
+<%- include('header', {
+    title: '结账',
+    user: null,
+    cartCount: cartCount
+}) %>
+
+<div class="container py-5">
+    <div class="row">
+        <!-- 订单信息 -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-receipt me-2"></i>订单信息</h4>
+                </div>
+                <div class="card-body">
+                    <h5 class="mb-3">购物车商品</h5>
+                    <% if (cartItems && cartItems.length > 0) { %>
+                        <% cartItems.forEach(item => { %>
+                            <div class="cart-item mb-3">
+                                <div class="row align-items-center">
+                                    <div class="col-md-2">
+                                        <% if (item.image_url) { %>
+                                            <img src="<%= item.image_url %>" alt="<%= item.name %>" class="img-fluid">
+                                        <% } else { %>
+                                            <i class="fas fa-water fa-3x text-muted"></i>
+                                        <% } %>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6 class="mb-1"><%= item.name %></h6>
+                                        <small class="text-muted">单价：¥<%= item.price.toFixed(2) %></small>
+                                    </div>
+                                    <div class="col-md-2 text-center">
+                                        <span>× <%= item.quantity %></span>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <strong>¥<%= (item.price * item.quantity).toFixed(2) %></strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="text-center py-4">
+                            <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                            <p>购物车为空</p>
+                            <a href="/products" class="btn btn-primary">去选购</a>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- 配送信息 -->
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="fas fa-truck me-2"></i>配送信息</h4>
+                </div>
+                <div class="card-body">
+                    <form id="checkoutForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">收货人姓名 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="name" required placeholder="请输入收货人姓名">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">联系电话 <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" name="phone" required placeholder="请输入手机号码" pattern="^1[3-9]\d{9}$">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">详细地址 <span class="text-danger">*</span></label>
+                            <textarea class="form-control" name="address" required rows="3" placeholder="请输入详细送货地址（省/市/区/街道门牌号）"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label">配送时间</label>
+                                <select class="form-select" name="deliveryTime">
+                                    <option value="asap">尽快配送</option>
+                                    <option value="morning">上午 (8:00-12:00)</option>
+                                    <option value="afternoon">下午 (12:00-18:00)</option>
+                                    <option value="evening">晚上 (18:00-20:00)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">楼层</label>
+                                <select class="form-select" name="floor">
+                                    <option value="1">一楼</option>
+                                    <option value="2">二楼</option>
+                                    <option value="3">三楼</option>
+                                    <option value="4">四楼</option>
+                                    <option value="5">五楼及以上</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">备注</label>
+                            <textarea class="form-control" name="remark" rows="2" placeholder="如有特殊需求请备注（如：放门口、电话联系等）"></textarea>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 订单摘要 -->
+        <div class="col-lg-4">
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-clipboard-list me-2"></i>订单摘要</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>商品数量:</span>
+                        <span id="totalQuantity"><%= totalQuantity %> 件</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>商品总价:</span>
+                        <span id="subtotal">¥<%= totalAmount.toFixed(2) %></span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>配送费:</span>
+                        <span class="text-success">免费</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>应付总额:</h5>
+                        <h4 class="text-primary" id="totalAmount">¥<%= totalAmount.toFixed(2) %></h4>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-success btn-lg" id="submitOrder" type="button">
+                            <i class="fas fa-check-circle me-2"></i>提交订单
+                        </button>
+                        <a href="/cart" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>返回购物车
+                        </a>
+                    </div>
+
+                    <div class="mt-4">
+                        <h6><i class="fas fa-shield-alt me-2"></i>购物保障</h6>
+                        <ul class="list-unstyled text-muted small">
+                            <li><i class="fas fa-check text-success me-2"></i>正品保证</li>
+                            <li><i class="fas fa-check text-success me-2"></i>快速配送</li>
+                            <li><i class="fas fa-check text-success me-2"></i>无忧售后</li>
+                            <li><i class="fas fa-phone me-2"></i>客服热线：400-888-8888</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const submitBtn = document.getElementById('submitOrder');
+
+    submitBtn.addEventListener('click', async function() {
+        const form = document.getElementById('checkoutForm');
+        const formData = new FormData(form);
+
+        // 验证必填项
+        const name = formData.get('name').trim();
+        const phone = formData.get('phone').trim();
+        const address = formData.get('address').trim();
+
+        if (!name || !phone || !address) {
+            showAlert('请填写完整的收货信息', 'warning');
+            return;
+        }
+
+        // 验证手机号
+        if (!/^1[3-9]\d{9}$/.test(phone)) {
+            showAlert('请输入正确的手机号码', 'warning');
+            return;
+        }
+
+        // 禁用按钮防止重复提交
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>提交中...';
+
+        try {
+            const response = await fetch('/orders/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: name,
+                    phone: phone,
+                    address: address,
+                    deliveryTime: formData.get('deliveryTime'),
+                    floor: formData.get('floor'),
+                    remark: formData.get('remark') || ''
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                showAlert('订单提交成功！', 'success');
+                // 重定向到订单详情页
+                setTimeout(() => {
+                    window.location.href = '/orders/' + result.orderId + '/success';
+                }, 1000);
+            } else {
+                showAlert(result.message || '提交失败，请重试', 'danger');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-check-circle me-2"></i>提交订单';
+            }
+        } catch (error) {
+            console.error('提交订单失败:', error);
+            showAlert('网络错误，请稍后重试', 'danger');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-check-circle me-2"></i>提交订单';
+        }
+    });
+});
+
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(alertDiv);
+
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 3000);
+}
+</script>
+
+<%- include('footer') %>
