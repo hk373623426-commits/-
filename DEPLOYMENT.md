@@ -1,36 +1,38 @@
-# 景田网站 Vercel 部署指南
+# 景田网站 Vercel 部署指南（2025 更新版）
 
-## 第一步：准备 GitHub 仓库
+## 🎯 已完成的优化
 
-### 1.1 创建 GitHub 仓库
+本项目已完成 Vercel 兼容性改造：
 
-1. 访问 [github.com](https://github.com)
-2. 点击右上角 "+" → "New repository"
-3. 填写仓库名称：`jingtian-water-website`
-4. 选择 "Public" 或 "Private"
-5. 点击 "Create repository"
+✅ **无状态会话管理** - 使用 cookie-session 替代 express-session
+✅ **Serverless 优化** - 支持 Vercel Functions 60 秒超时
+✅ **数据库自动初始化** - 每次部署自动创建 SQLite 数据库
+✅ **环境变量配置** - 支持 Vercel 环境变量
 
-### 1.2 推送代码到 GitHub
+---
+
+## 第一步：推送代码到 GitHub
 
 打开命令行，在项目目录下执行：
 
 ```bash
-# 初始化 git（如果还没有）
-git init
+# 切换到项目目录
+cd jingtian-water-website
 
 # 添加所有文件
 git add .
 
 # 提交
-git commit -m "Initial commit - 景田免注册电商网站"
+git commit -m "修复 Vercel 部署：改用 cookie-session 和无状态架构"
 
-# 添加远程仓库（替换 YOUR_USERNAME 为你的 GitHub 用户名）
-git remote add origin https://github.com/YOUR_USERNAME/jingtian-water-website.git
+# 添加远程仓库（如果还没有）
+git remote add origin https://github.com/hk373623426-commits/-.git
 
 # 推送到 GitHub
-git branch -M main
 git push -u origin main
 ```
+
+⚠️ **注意**: 如果推送失败，请检查网络连接或重试。
 
 ---
 
@@ -56,15 +58,17 @@ git push -u origin main
 - **Output Directory**: 留空
 - **Install Command**: `npm install`（默认）
 
-### 2.4 添加环境变量（可选）
+### 2.4 添加环境变量（推荐）
 
 点击 "Environment Variables" 添加：
 
-| Name | Value |
-|------|-------|
-| `SESSION_SECRET` | 任意随机字符串，如 `jingtian-secret-2025` |
-| `ADMIN_EMAIL` | `admin@jingtian.com` |
-| `ADMIN_PASSWORD` | `admin123` |
+| Name | Value | 说明 |
+|------|-------|------|
+| `SESSION_SECRET` | `jingtian-secret-2025-random` | 会话加密密钥 |
+| `ADMIN_EMAIL` | `admin@jingtian.com` | 管理员账号 |
+| `ADMIN_PASSWORD` | `admin123` | 管理员密码 |
+
+💡 **提示**: cookie-session 将会话数据加密后存储在客户端 cookie 中，无需服务端会话存储。
 
 ### 2.5 开始部署
 
@@ -89,20 +93,21 @@ git push -u origin main
 
 ## 重要说明
 
-### 数据库持久化
+### 📦 数据库持久化
 
 ⚠️ **Vercel 免费版使用临时文件系统**，数据库在以下情况会被重置：
 
 - 每次重新部署后
-- 容器重启时
+- 容器重启时（较少见）
 
-**解决方案：**
+**当前解决方案：**
+使用 `/tmp/jingtian.db` 临时存储，每次部署自动初始化数据。
 
-1. **对于演示/测试用途**: 当前配置已经足够
-2. **对于生产环境**: 建议迁移到外部数据库
-   - [Supabase](https://supabase.com) - 免费 PostgreSQL
-   - [PlanetScale](https://planetscale.com) - 免费 MySQL
-   - [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) - Vercel 官方存储
+**生产环境推荐方案：**
+迁移到外部数据库：
+- [Supabase](https://supabase.com) - 免费 PostgreSQL
+- [Vercel KV](https://vercel.com/docs/storage/vercel-kv) - Vercel 官方 Redis
+- [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) - Vercel 对象存储
 
 ### 自动部署
 
