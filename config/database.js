@@ -156,9 +156,33 @@ class Database {
 
     const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
-    this.db.run(
-      `INSERT OR IGNORE INTO users (username, email, password, is_admin) VALUES (?, ?, ?, ?)`,
-      ['admin', adminEmail, hashedPassword, 1]
+    // 先检查是否已存在管理员账号
+    this.db.get(
+      'SELECT * FROM users WHERE email = ? AND is_admin = 1',
+      [adminEmail],
+      (err, row) => {
+        if (err) {
+          console.error('检查管理员账号失败:', err);
+          return;
+        }
+
+        if (!row) {
+          // 不存在则创建
+          this.db.run(
+            `INSERT INTO users (username, email, password, is_admin) VALUES (?, ?, ?, ?)`,
+            ['admin', adminEmail, hashedPassword, 1],
+            (err) => {
+              if (err) {
+                console.error('创建管理员账号失败:', err);
+              } else {
+                console.log('✓ 管理员账号创建成功:', adminEmail);
+              }
+            }
+          );
+        } else {
+          console.log('✓ 管理员账号已存在:', adminEmail);
+        }
+      }
     );
   }
 
