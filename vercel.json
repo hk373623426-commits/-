@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "framework": null,
-  "buildCommand": null,
+  "framework": "",
+  "buildCommand": "",
   "builds": [
     {
       "src": "api/app.js",
