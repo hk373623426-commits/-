@@ -19,7 +19,7 @@ app.use(cookieSession({
   name: 'jingtian_session',
   keys: [process.env.SESSION_SECRET || 'jingtian-water-secret-key-2024'],
   maxAge: 24 * 60 * 60 * 1000, // 24 小时
-  secure: process.env.NODE_ENV === 'production',
+  secure: false, // Vercel 预览环境使用 HTTP，设置为 false
   sameSite: 'lax'
 }));
 
