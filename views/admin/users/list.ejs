@@ -1,0 +1,93 @@
+<%- include('../layout', {
+    title: '用户管理',
+    currentPage: 'users',
+    user: user
+}) %>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">用户列表</h5>
+    </div>
+    <div class="card-body">
+        <!-- 用户表格 -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>用户名</th>
+                        <th>邮箱</th>
+                        <th>电话</th>
+                        <th>角色</th>
+                        <th>注册时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (users && users.length > 0) { %>
+                        <% users.forEach(user => { %>
+                            <tr>
+                                <td><%= user.id %></td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="user-avatar" style="width: 32px; height: 32px; font-size: 14px;">
+                                            <%= user.username ? user.username.charAt(0).toUpperCase() : 'U' %>
+                                        </div>
+                                        <strong><%= user.username %></strong>
+                                    </div>
+                                </td>
+                                <td><%= user.email %></td>
+                                <td><%= user.phone || '未填写' %></td>
+                                <td>
+                                    <% if (user.is_admin) { %>
+                                        <span class="badge bg-danger">管理员</span>
+                                    <% } else { %>
+                                        <span class="badge bg-secondary">普通用户</span>
+                                    <% } %>
+                                </td>
+                                <td><%= new Date(user.created_at).toLocaleString('zh-CN') %></td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-5">
+                                <i class="fas fa-users fa-3x mb-3"></i>
+                                <p>暂无用户数据</p>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 分页 -->
+        <% if (totalPages > 1) { %>
+            <nav aria-label="用户分页">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item <%= currentPageNum <= 1 ? 'disabled' : '' %>">
+                        <a class="page-link" href="/admin/users?page=<%= currentPageNum - 1 %>">上一页</a>
+                    </li>
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                        <li class="page-item <%= currentPageNum === i ? 'active' : '' %>">
+                            <a class="page-link" href="/admin/users?page=<%= i %>"><%= i %></a>
+                        </li>
+                    <% } %>
+                    <li class="page-item <%= currentPageNum >= totalPages ? 'disabled' : '' %>">
+                        <a class="page-link" href="/admin/users?page=<%= currentPageNum + 1 %>">下一页</a>
+                    </li>
+                </ul>
+            </nav>
+        <% } %>
+    </div>
+</div>
+
+<style>
+.user-avatar {
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+</style>

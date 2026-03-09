@@ -1,0 +1,59 @@
+<%- include('../layout', {
+    title: '分类管理',
+    currentPage: 'categories',
+    user: user
+}) %>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">分类列表</h5>
+    </div>
+    <div class="card-body">
+        <!-- 分类表格 -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>分类名称</th>
+                        <th>描述</th>
+                        <th>图标</th>
+                        <th>产品数量</th>
+                        <th>创建时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (categories && categories.length > 0) { %>
+                        <% categories.forEach(category => { %>
+                            <tr>
+                                <td><%= category.id %></td>
+                                <td><strong><%= category.name %></strong></td>
+                                <td><%= category.description || '-' %></td>
+                                <td>
+                                    <% if (category.icon) { %>
+                                        <i class="<%= category.icon %> fa-lg"></i>
+                                    <% } else { %>
+                                        <i class="fas fa-tag fa-lg text-muted"></i>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary rounded-pill">
+                                        <%= category.product_count || 0 %> 个产品
+                                    </span>
+                                </td>
+                                <td><%= new Date(category.created_at).toLocaleString('zh-CN') %></td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-5">
+                                <i class="fas fa-tags fa-3x mb-3"></i>
+                                <p>暂无分类数据</p>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

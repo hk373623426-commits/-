@@ -1,4 +1,4 @@
-<%- include('frontend/header', {
+<%- include('layout', {
     title: '仪表盘',
     currentPage: 'dashboard',
     user: user
@@ -149,7 +149,7 @@
                             <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                                 <div>
                                     <h6 class="mb-1"><%= product.name %></h6>
-                                    <small class="text-muted">销量: <%= product.total_sold || 0 %></small>
+                                    <small class="text-muted">销量：<%= product.total_sold || 0 %></small>
                                 </div>
                                 <span class="badge bg-primary rounded-pill">¥<%= product.price.toFixed(2) %></span>
                             </div>
@@ -232,10 +232,8 @@ const revenueChart = new Chart(revenueCtx, {
     }
 });
 
-// 自动刷新数据（每5分钟）
+// 自动刷新数据（每 5 分钟）
 setTimeout(() => {
     location.reload();
 }, 5 * 60 * 1000);
 </script>
-
-<%- include('frontend/footer') %>
