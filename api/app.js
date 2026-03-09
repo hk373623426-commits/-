@@ -19,7 +19,7 @@ app.use(cookieSession({
   name: 'jingtian_session',
   keys: [process.env.SESSION_SECRET || 'jingtian-water-secret-key-2024'],
   maxAge: 24 * 60 * 60 * 1000, // 24 小时
-  secure: process.env.NODE_ENV === 'production',
+  secure: false, // Vercel 预览环境使用 HTTP，设置为 false
   sameSite: 'lax'
 }));
 
@@ -71,6 +71,23 @@ app.use('/products', productRoutes);
 app.use('/cart', cartRoutes);
 app.use('/orders', orderRoutes);
 app.use('/admin', adminRoutes);
+
+// 调试 API（仅用于测试）
+app.get('/api/debug', (req, res) => {
+  const db = require('../config/database');
+  db.get('SELECT id, username, email, is_admin FROM users WHERE email = ?', ['admin@jingtian.com'])
+    .then(user => {
+      res.json({
+        success: true,
+        adminUser: user || null,
+        session: req.session || {},
+        user: req.session?.user || null
+      });
+    })
+    .catch(err => {
+      res.status(500).json({ success: false, error: err.message });
+    });
+});
 
 // 错误处理中间件
 app.use((err, req, res, next) => {
