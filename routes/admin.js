@@ -38,13 +38,37 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // 查找管理员用户
+    console.log('[Admin Login] 尝试登录:', email);
+
+    // 确保管理员账号存在（Vercel Serverless 每次请求都可能重置数据库）
+    const bcrypt = require('bcryptjs');
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@jingtian.com';
+    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+
+    // 检查是否存在管理员账号
+    let adminUser = await db.get('SELECT * FROM users WHERE email = ? AND is_admin = 1', [adminEmail]);
+
+    if (!adminUser) {
+      console.log('[Admin Login] 管理员账号不存在，创建默认管理员账号');
+      const hashedPassword = await bcrypt.hash(adminPassword, 10);
+      await db.run(
+        'INSERT INTO users (username, email, password, is_admin) VALUES (?, ?, ?, ?)',
+        ['admin', adminEmail, hashedPassword, 1]
+      );
+      adminUser = await db.get('SELECT * FROM users WHERE email = ? AND is_admin = 1', [adminEmail]);
+      console.log('[Admin Login] 管理员账号创建成功:', adminEmail);
+    }
+
+    // 查找登录用户
     const user = await db.get(
       'SELECT * FROM users WHERE email = ? AND is_admin = 1',
       [email]
     );
 
+    console.log('[Admin Login] 查询结果:', user ? '找到用户' : '未找到用户');
+
     if (!user) {
+      console.log('[Admin Login] 管理员账户不存在:', email);
       return res.render('admin/login', {
         title: '后台登录',
         layout: false,
@@ -56,8 +80,9 @@ router.post('/login', async (req, res) => {
     }
 
     // 验证密码
-    const bcrypt = require('bcryptjs');
     const isValidPassword = await bcrypt.compare(password, user.password);
+    console.log('[Admin Login] 密码验证:', isValidPassword ? '成功' : '失败');
+
     if (!isValidPassword) {
       return res.render('admin/login', {
         title: '后台登录',
@@ -77,6 +102,7 @@ router.post('/login', async (req, res) => {
       is_admin: user.is_admin
     };
 
+    console.log('[Admin Login] 登录成功，设置 session:', req.session.user);
     res.redirect('/admin/dashboard');
 
   } catch (error) {
