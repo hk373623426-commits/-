@@ -48,14 +48,18 @@ if (isVercel) {
   process.env.DB_PATH = process.env.DB_PATH || './database/jingtian.db';
 }
 
-// 数据库初始化（延迟初始化，确保 Vercel 环境正确）
+// 数据库初始化（在模块加载时立即初始化）
 const db = require('../config/database');
-if (isVercel) {
-  // Vercel 每次请求都需要重新初始化
-  db.initializeDatabase();
-} else {
-  db.initializeDatabase();
-}
+
+// 立即执行初始化，确保在路由处理前完成
+(async () => {
+  try {
+    await db.initializeDatabase();
+    console.log('数据库初始化完成');
+  } catch (error) {
+    console.error('数据库初始化失败:', error);
+  }
+})();
 
 // 路由
 const indexRoutes = require('../routes/index');

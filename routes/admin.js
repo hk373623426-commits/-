@@ -27,11 +27,11 @@ const upload = multer({
   fileFilter: (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|gif|webp/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
+    const mimetype = allowedTypes.test(file.mimetype || '');
     if (extname && mimetype) {
       cb(null, true);
     } else {
-      cb(new Error('只支持图片文件（JPG、PNG、GIF、WebP）'));
+      cb(null, false);
     }
   }
 });
@@ -513,7 +513,26 @@ router.get('/products/:id/edit', requireAdmin, async (req, res) => {
 });
 
 // 添加/更新产品
-router.post('/products/:id?', requireAdmin, upload.single('image'), async (req, res) => {
+router.post('/products/:id?', requireAdmin, (req, res, next) => {
+  const productId = req.params.id;
+  // multer 错误处理包装
+  upload.single('image')(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      req.session.message = {
+        type: 'danger',
+        text: `图片上传失败：${err.code === 'LIMIT_FILE_SIZE' ? '文件超过 5MB 限制' : err.message}`
+      };
+      return res.redirect(productId ? `/admin/products/${productId}/edit` : '/admin/products/new');
+    } else if (err) {
+      req.session.message = {
+        type: 'danger',
+        text: '图片上传失败，请重试'
+      };
+      return res.redirect(productId ? `/admin/products/${productId}/edit` : '/admin/products/new');
+    }
+    next();
+  });
+}, async (req, res) => {
   try {
     const { name, description, price, category_id, stock, is_active } = req.body;
     const productId = req.params.id;

@@ -20,118 +20,150 @@ class Database {
   }
 
   // 初始化数据库表
-  initializeDatabase() {
-    this.createUsersTable();
-    this.createProductsTable();
-    this.createCategoriesTable();
-    this.createCartTable();
-    this.createOrdersTable();
-    this.createOrderItemsTable();
-    this.createOrdersV2Table();
-    this.createOrderItemsV2Table();
-    this.createAdminUser();
+  async initializeDatabase() {
+    await this.createUsersTable();
+    await this.createProductsTable();
+    await this.createCategoriesTable();
+    await this.createCartTable();
+    await this.createOrdersTable();
+    await this.createOrderItemsTable();
+    await this.createOrdersV2Table();
+    await this.createOrderItemsV2Table();
+    await this.createAdminUser();
   }
 
-  createUsersTable() {
-    const sql = `
-      CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE NOT NULL,
-        email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        phone TEXT,
-        address TEXT,
-        is_admin BOOLEAN DEFAULT 0,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `;
-    this.db.run(sql);
-  }
-
-  createProductsTable() {
-    const sql = `
-      CREATE TABLE IF NOT EXISTS products (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        description TEXT,
-        price DECIMAL(10,2) NOT NULL,
-        category_id INTEGER,
-        image_url TEXT,
-        stock INTEGER DEFAULT 100,
-        is_active BOOLEAN DEFAULT 1,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (category_id) REFERENCES categories(id)
-      )
-    `;
-    this.db.run(sql);
-  }
-
-  createCategoriesTable() {
-    const sql = `
-      CREATE TABLE IF NOT EXISTS categories (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        description TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `;
-    this.db.run(sql, () => {
-      // 插入默认分类
-      this.insertDefaultCategories();
+  async createUsersTable() {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        CREATE TABLE IF NOT EXISTS users (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          username TEXT UNIQUE NOT NULL,
+          email TEXT UNIQUE NOT NULL,
+          password TEXT NOT NULL,
+          phone TEXT,
+          address TEXT,
+          is_admin BOOLEAN DEFAULT 0,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
+      this.db.run(sql, (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
     });
   }
 
-  createCartTable() {
-    const sql = `
-      CREATE TABLE IF NOT EXISTS cart (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        session_id TEXT NOT NULL,
-        product_id INTEGER NOT NULL,
-        quantity INTEGER DEFAULT 1,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (product_id) REFERENCES products(id)
-      )
-    `;
-    this.db.run(sql);
+  async createProductsTable() {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        CREATE TABLE IF NOT EXISTS products (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          description TEXT,
+          price DECIMAL(10,2) NOT NULL,
+          category_id INTEGER,
+          image_url TEXT,
+          stock INTEGER DEFAULT 100,
+          is_active BOOLEAN DEFAULT 1,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (category_id) REFERENCES categories(id)
+        )
+      `;
+      this.db.run(sql, (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
   }
 
-  createOrdersTable() {
-    const sql = `
-      CREATE TABLE IF NOT EXISTS orders (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        order_number TEXT UNIQUE NOT NULL,
-        user_id INTEGER NOT NULL,
-        total_amount DECIMAL(10,2) NOT NULL,
-        status TEXT DEFAULT 'pending',
-        shipping_address TEXT NOT NULL,
-        contact_phone TEXT NOT NULL,
-        payment_method TEXT DEFAULT 'cash',
-        payment_status TEXT DEFAULT 'unpaid',
-        notes TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-      )
-    `;
-    this.db.run(sql);
+  async createCategoriesTable() {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        CREATE TABLE IF NOT EXISTS categories (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          description TEXT,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
+      this.db.run(sql, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          // 插入默认分类
+          this.insertDefaultCategories();
+          resolve();
+        }
+      });
+    });
   }
 
-  createOrderItemsTable() {
-    const sql = `
-      CREATE TABLE IF NOT EXISTS order_items (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        order_id INTEGER NOT NULL,
-        product_id INTEGER NOT NULL,
-        quantity INTEGER NOT NULL,
-        price DECIMAL(10,2) NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (order_id) REFERENCES orders(id),
-        FOREIGN KEY (product_id) REFERENCES products(id)
-      )
-    `;
-    this.db.run(sql);
+  async createCartTable() {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        CREATE TABLE IF NOT EXISTS cart (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          session_id TEXT NOT NULL,
+          product_id INTEGER NOT NULL,
+          quantity INTEGER DEFAULT 1,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (product_id) REFERENCES products(id)
+        )
+      `;
+      this.db.run(sql, (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+  }
+
+  async createOrdersTable() {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        CREATE TABLE IF NOT EXISTS orders (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          order_number TEXT UNIQUE NOT NULL,
+          user_id INTEGER NOT NULL,
+          total_amount DECIMAL(10,2) NOT NULL,
+          status TEXT DEFAULT 'pending',
+          shipping_address TEXT NOT NULL,
+          contact_phone TEXT NOT NULL,
+          payment_method TEXT DEFAULT 'cash',
+          payment_status TEXT DEFAULT 'unpaid',
+          notes TEXT,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+      `;
+      this.db.run(sql, (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+  }
+
+  async createOrderItemsTable() {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        CREATE TABLE IF NOT EXISTS order_items (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          order_id INTEGER NOT NULL,
+          product_id INTEGER NOT NULL,
+          quantity INTEGER NOT NULL,
+          price DECIMAL(10,2) NOT NULL,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (order_id) REFERENCES orders(id),
+          FOREIGN KEY (product_id) REFERENCES products(id)
+        )
+      `;
+      this.db.run(sql, (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
   }
 
   async insertDefaultCategories() {
@@ -142,12 +174,18 @@ class Database {
       { name: '水票套餐', description: '优惠套餐组合' }
     ];
 
-    categories.forEach(category => {
-      this.db.run(
-        'INSERT OR IGNORE INTO categories (name, description) VALUES (?, ?)',
-        [category.name, category.description]
-      );
-    });
+    return Promise.all(categories.map(category => {
+      return new Promise((resolve, reject) => {
+        this.db.run(
+          'INSERT OR IGNORE INTO categories (name, description) VALUES (?, ?)',
+          [category.name, category.description],
+          (err) => {
+            if (err) reject(err);
+            else resolve();
+          }
+        );
+      });
+    }));
   }
 
   async createAdminUser() {
@@ -156,72 +194,87 @@ class Database {
 
     const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
-    // 先检查是否已存在管理员账号
-    this.db.get(
-      'SELECT * FROM users WHERE email = ? AND is_admin = 1',
-      [adminEmail],
-      (err, row) => {
-        if (err) {
-          console.error('检查管理员账号失败:', err);
-          return;
-        }
+    return new Promise((resolve, reject) => {
+      // 先检查是否已存在管理员账号
+      this.db.get(
+        'SELECT * FROM users WHERE email = ? AND is_admin = 1',
+        [adminEmail],
+        (err, row) => {
+          if (err) {
+            reject(err);
+            return;
+          }
 
-        if (!row) {
-          // 不存在则创建
-          this.db.run(
-            `INSERT INTO users (username, email, password, is_admin) VALUES (?, ?, ?, ?)`,
-            ['admin', adminEmail, hashedPassword, 1],
-            (err) => {
-              if (err) {
-                console.error('创建管理员账号失败:', err);
-              } else {
-                console.log('✓ 管理员账号创建成功:', adminEmail);
+          if (!row) {
+            // 不存在则创建
+            this.db.run(
+              `INSERT INTO users (username, email, password, is_admin) VALUES (?, ?, ?, ?)`,
+              ['admin', adminEmail, hashedPassword, 1],
+              (err) => {
+                if (err) {
+                  console.error('创建管理员账号失败:', err);
+                  reject(err);
+                } else {
+                  console.log('✓ 管理员账号创建成功:', adminEmail);
+                  resolve();
+                }
               }
-            }
-          );
-        } else {
-          console.log('✓ 管理员账号已存在:', adminEmail);
+            );
+          } else {
+            console.log('✓ 管理员账号已存在:', adminEmail);
+            resolve();
+          }
         }
-      }
-    );
+      );
+    });
   }
 
-  createOrdersV2Table() {
-    const sql = `
-      CREATE TABLE IF NOT EXISTS orders_v2 (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        order_number TEXT UNIQUE NOT NULL,
-        total_amount DECIMAL(10,2) NOT NULL,
-        status TEXT DEFAULT 'pending',
-        customer_name TEXT NOT NULL,
-        customer_phone TEXT NOT NULL,
-        delivery_address TEXT NOT NULL,
-        delivery_time TEXT DEFAULT 'asap',
-        floor TEXT DEFAULT '1',
-        remark TEXT,
-        session_id TEXT NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `;
-    this.db.run(sql);
+  async createOrdersV2Table() {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        CREATE TABLE IF NOT EXISTS orders_v2 (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          order_number TEXT UNIQUE NOT NULL,
+          total_amount DECIMAL(10,2) NOT NULL,
+          status TEXT DEFAULT 'pending',
+          customer_name TEXT NOT NULL,
+          customer_phone TEXT NOT NULL,
+          delivery_address TEXT NOT NULL,
+          delivery_time TEXT DEFAULT 'asap',
+          floor TEXT DEFAULT '1',
+          remark TEXT,
+          session_id TEXT NOT NULL,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
+      this.db.run(sql, (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
   }
 
-  createOrderItemsV2Table() {
-    const sql = `
-      CREATE TABLE IF NOT EXISTS order_items_v2 (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        order_id INTEGER NOT NULL,
-        product_id INTEGER NOT NULL,
-        product_name TEXT NOT NULL,
-        quantity INTEGER NOT NULL,
-        price DECIMAL(10,2) NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (order_id) REFERENCES orders_v2(id),
-        FOREIGN KEY (product_id) REFERENCES products(id)
-      )
-    `;
-    this.db.run(sql);
+  async createOrderItemsV2Table() {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        CREATE TABLE IF NOT EXISTS order_items_v2 (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          order_id INTEGER NOT NULL,
+          product_id INTEGER NOT NULL,
+          product_name TEXT NOT NULL,
+          quantity INTEGER NOT NULL,
+          price DECIMAL(10,2) NOT NULL,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (order_id) REFERENCES orders_v2(id),
+          FOREIGN KEY (product_id) REFERENCES products(id)
+        )
+      `;
+      this.db.run(sql, (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
   }
 
   // 通用查询方法
