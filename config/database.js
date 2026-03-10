@@ -88,13 +88,19 @@ class Database {
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
       `;
-      this.db.run(sql, (err) => {
+      this.db.run(sql, async (err) => {
         if (err) {
           reject(err);
         } else {
-          // 插入默认分类
-          this.insertDefaultCategories();
-          resolve();
+          try {
+            // 插入默认分类
+            await this.insertDefaultCategories();
+            // 插入默认产品
+            await this.insertDefaultProducts();
+            resolve();
+          } catch (error) {
+            reject(error);
+          }
         }
       });
     });
@@ -182,6 +188,39 @@ class Database {
           (err) => {
             if (err) reject(err);
             else resolve();
+          }
+        );
+      });
+    }));
+  }
+
+  async insertDefaultProducts() {
+    const products = [
+      { name: '景田天然矿泉水 12.8L 桶装', description: '家庭装大桶矿泉水，适合饮水机使用', price: 18.00, category_id: 1, image_url: '/images/products/barrel-12.8l.jpg', stock: 1000 },
+      { name: '景田天然矿泉水 18.9L 桶装', description: '商用装超大桶矿泉水，经济实惠', price: 22.00, category_id: 1, image_url: '/images/products/barrel-18.9l.jpg', stock: 1000 },
+      { name: '景田天然矿泉水 5L 桶装', description: '小桶装矿泉水，适合小家庭使用', price: 12.00, category_id: 1, image_url: '/images/products/barrel-5l.jpg', stock: 1000 },
+      { name: '景田天然矿泉水 350ml*24 瓶', description: '便携式瓶装水，适合会议、旅行使用', price: 36.00, category_id: 2, image_url: '/images/products/bottle-350ml.jpg', stock: 500 },
+      { name: '景田天然矿泉水 550ml*24 瓶', description: '标准瓶装水，日常饮用最佳选择', price: 48.00, category_id: 2, image_url: '/images/products/bottle-550ml.jpg', stock: 500 },
+      { name: '景田天然矿泉水 1.5L*12 瓶', description: '大瓶装水，适合家庭、办公室储备', price: 42.00, category_id: 2, image_url: '/images/products/bottle-1.5l.jpg', stock: 500 },
+      { name: '台式温热饮水机', description: '台式设计，温热双温出水', price: 198.00, category_id: 3, image_url: '/images/products/dispenser-desktop.jpg', stock: 50 },
+      { name: '立式冷热饮水机', description: '立式设计，冷热双温出水，节能省电', price: 398.00, category_id: 3, image_url: '/images/products/dispenser-vertical.jpg', stock: 30 },
+      { name: '智能茶吧机', description: '智能温控，多档水温调节', price: 598.00, category_id: 3, image_url: '/images/products/dispenser-smart.jpg', stock: 20 },
+      { name: '10 桶水票套餐', description: '购买 10 桶水，享受优惠价格', price: 168.00, category_id: 4, image_url: '/images/products/ticket-10.jpg', stock: 9999 },
+      { name: '20 桶水票套餐', description: '购买 20 桶水，超值优惠', price: 320.00, category_id: 4, image_url: '/images/products/ticket-20.jpg', stock: 9999 },
+      { name: '50 桶水票套餐', description: '购买 50 桶水，最优惠选择', price: 750.00, category_id: 4, image_url: '/images/products/ticket-50.jpg', stock: 9999 }
+    ];
+
+    return Promise.all(products.map((product, index) => {
+      return new Promise((resolve, reject) => {
+        this.db.run(
+          'INSERT OR IGNORE INTO products (name, description, price, category_id, image_url, stock, is_active) VALUES (?, ?, ?, ?, ?, ?, 1)',
+          [product.name, product.description, product.price, product.category_id, product.image_url, product.stock],
+          (err) => {
+            if (err) reject(err);
+            else {
+              console.log(`✓ 产品 "${product.name}" 已添加`);
+              resolve();
+            }
           }
         );
       });
