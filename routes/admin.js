@@ -1,6 +1,40 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/database');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+// 配置文件上传
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(__dirname, '../public/images/products');
+    // 确保目录存在
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'product-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 限制 5MB
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|webp/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    if (extname && mimetype) {
+      cb(null, true);
+    } else {
+      cb(new Error('只支持图片文件（JPG、PNG、GIF、WebP）'));
+    }
+  }
+});
 
 // 中间件：检查管理员权限
 const requireAdmin = (req, res, next) => {
@@ -479,10 +513,17 @@ router.get('/products/:id/edit', requireAdmin, async (req, res) => {
 });
 
 // 添加/更新产品
-router.post('/products/:id?', requireAdmin, async (req, res) => {
+router.post('/products/:id?', requireAdmin, upload.single('image'), async (req, res) => {
   try {
     const { name, description, price, category_id, stock, is_active } = req.body;
     const productId = req.params.id;
+    let imageUrl = req.body.existing_image_url || '';
+
+    // 处理新上传的图片
+    if (req.file) {
+      imageUrl = `/images/products/${req.file.filename}`;
+      console.log('[Product Save] 图片上传成功:', imageUrl);
+    }
 
     // 验证输入
     if (!name || !price) {
@@ -498,9 +539,9 @@ router.post('/products/:id?', requireAdmin, async (req, res) => {
       await db.run(
         `UPDATE products SET
           name = ?, description = ?, price = ?, category_id = ?,
-          stock = ?, is_active = ?, updated_at = datetime("now")
+          stock = ?, is_active = ?, image_url = ?, updated_at = datetime("now")
          WHERE id = ?`,
-        [name, description || null, price, category_id || null, stock || 0, is_active ? 1 : 0, productId]
+        [name, description || null, price, category_id || null, stock || 0, is_active ? 1 : 0, imageUrl, productId]
       );
 
       req.session.message = {
@@ -511,9 +552,9 @@ router.post('/products/:id?', requireAdmin, async (req, res) => {
       // 添加产品
       await db.run(
         `INSERT INTO products (
-          name, description, price, category_id, stock, is_active
-        ) VALUES (?, ?, ?, ?, ?, ?)`,
-        [name, description || null, price, category_id || null, stock || 0, is_active ? 1 : 0]
+          name, description, price, category_id, stock, is_active, image_url
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [name, description || null, price, category_id || null, stock || 0, is_active ? 1 : 0, imageUrl]
       );
 
       req.session.message = {

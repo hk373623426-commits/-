@@ -11,7 +11,8 @@
         </div>
     </div>
     <div class="card-body">
-        <form method="POST" action="<%= action %>">
+        <form method="POST" action="<%= action %>" enctype="multipart/form-data">
+            <input type="hidden" name="existing_image_url" value="<%= product && product.image_url ? product.image_url : '' %>">
             <div class="row">
                 <div class="col-md-8">
                     <!-- 产品名称 -->
@@ -70,6 +71,19 @@
                                 <%= product && product.is_active ? '上架销售' : '下架停售' %>
                             </label>
                         </div>
+                    </div>
+
+                    <!-- 产品图片 -->
+                    <div class="mb-3">
+                        <label for="image" class="form-label">产品图片</label>
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                        <% if (product && product.image_url) { %>
+                            <div class="mt-2">
+                                <p class="text-muted small mb-1">当前图片：</p>
+                                <img src="<%= product.image_url %>" alt="产品图片" style="max-width: 200px; max-height: 200px; border-radius: 8px;">
+                            </div>
+                        <% } %>
+                        <small class="text-muted">支持 JPG、PNG 格式，建议尺寸 800x800 像素</small>
                     </div>
 
                     <!-- 提交按钮 -->
